@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime
 
 from models import db
@@ -14,12 +15,23 @@ class Projet(db.Model):
     adresse_chantier = db.Column(db.String(255))
     statut = db.Column(db.String(20), default="brouillon")
     notes = db.Column(db.Text)
+    token = db.Column(db.String(32), unique=True, default=lambda: uuid.uuid4().hex)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     client = db.relationship("Client", back_populates="projets")
     zones = db.relationship(
         "Zone", back_populates="projet", cascade="all, delete-orphan"
     )
+    validations = db.relationship(
+        "Validation",
+        back_populates="projet",
+        cascade="all, delete-orphan",
+        order_by="Validation.created_at.desc()",
+    )
+
+    @property
+    def derniere_validation(self):
+        return self.validations[0] if self.validations else None
 
     def to_dict(self):
         return {

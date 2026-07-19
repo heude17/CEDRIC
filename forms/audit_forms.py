@@ -9,7 +9,7 @@ from wtforms import (
     StringField,
     TextAreaField,
 )
-from wtforms.validators import DataRequired, NumberRange, Optional
+from wtforms.validators import DataRequired, Email, NumberRange, Optional
 
 from models.composant import TYPES_COMPOSANT, TYPES_INTERRUPTEUR
 from models.zone import TYPES_PIECE
@@ -61,3 +61,13 @@ class ZoneForm(FlaskForm):
     surface_m2 = FloatField("Surface (m²)", validators=[Optional()])
     notes = TextAreaField("Notes générales", validators=[Optional()])
     composants = FieldList(FormField(ComposantForm), min_entries=1)
+
+
+class ValidationForm(FlaskForm):
+    nom_signataire = StringField("Nom et prénom", validators=[DataRequired()])
+    email_signataire = StringField("Email (optionnel)", validators=[Optional(), Email()])
+    commentaire = TextAreaField("Commentaire (optionnel)", validators=[Optional()])
+    confirmation = BooleanField(
+        "Je certifie avoir vérifié les informations de cet audit",
+        validators=[DataRequired(message="La confirmation est requise pour valider l'audit.")],
+    )

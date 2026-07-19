@@ -1,0 +1,67 @@
+{% extends "base_public.html" %}
+{% from "_macros.html" import field %}
+{% block title %}Validation — {{ projet.nom }}{% endblock %}
+{% block content %}
+    <h1 class="text-xl font-bold mb-1">Validation de l'audit</h1>
+    <p class="text-sm text-slate-500 mb-4">{{ projet.nom }} — {{ projet.client.nom }}</p>
+
+    {% if validation %}
+        <div class="bg-emerald-100 border border-emerald-200 text-emerald-800 rounded-md px-4 py-3 text-sm font-medium mb-4">
+            ✓ Déjà validé par {{ validation.nom_signataire }} le {{ validation.created_at.strftime("%d/%m/%Y à %H:%M") }}
+        </div>
+    {% endif %}
+
+    <section class="bg-white rounded-lg shadow-sm border border-slate-200 p-4 mb-4">
+        <h2 class="font-semibold mb-3">Résumé de l'audit</h2>
+
+        {% if projet.adresse_chantier %}
+            <p class="text-sm text-slate-500 mb-3">{{ projet.adresse_chantier }}</p>
+        {% endif %}
+
+        {% if projet.zones %}
+            <div class="space-y-4">
+                {% for zone in projet.zones %}
+                    <div class="border border-slate-200 rounded-md p-3">
+                        <p class="font-medium">
+                            {{ zone.nom }}
+                            <span class="text-slate-400 font-normal text-sm">
+                                — {{ zone.type_piece.replace("_", " ").capitalize() }}
+                                {% if zone.surface_m2 %} · {{ zone.surface_m2 }} m²{% endif %}
+                            </span>
+                        </p>
+                        {% if zone.composants %}
+                            <ul class="mt-2 text-sm text-slate-600 space-y-1">
+                                {% for c in zone.composants %}
+                                    <li>
+                                        • {{ c.type_composant.replace("_", " ").capitalize() }}
+                                        (x{{ c.quantite }})
+                                        {% if c.besoin_motorisation %}<span class="text-emerald-600">· motorisation</span>{% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="text-sm text-slate-400 mt-1">Aucun composant renseigné.</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-sm text-slate-500">Aucune pièce auditée pour ce projet.</p>
+        {% endif %}
+    </section>
+
+    <section class="bg-white rounded-lg shadow-sm border border-slate-200 p-4">
+        <h2 class="font-semibold mb-3">{{ "Confirmer à nouveau" if validation else "Je valide cet audit" }}</h2>
+        <form method="post">
+            {{ form.hidden_tag() }}
+            {{ field(form.nom_signataire) }}
+            {{ field(form.email_signataire) }}
+            {{ field(form.commentaire) }}
+            {{ field(form.confirmation) }}
+            <button type="submit"
+                    class="w-full bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-white font-medium px-5 py-2.5 rounded-md transition">
+                Valider l'audit
+            </button>
+        </form>
+    </section>
+{% endblock %}

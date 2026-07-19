@@ -14,6 +14,31 @@
         </a>
     </div>
 
+    <div class="flex flex-col sm:flex-row gap-2 mb-4">
+        <a href="{{ url_for('pdf.projet_pdf', projet_id=projet.id) }}"
+           class="flex-1 text-center bg-slate-900 hover:bg-slate-800 text-white font-medium px-4 py-2.5 rounded-md transition">
+            Télécharger le PDF
+        </a>
+        <a href="{{ url_for('validation.valider', token=projet.token) }}"
+           class="flex-1 text-center border-2 border-slate-900 text-slate-900 hover:bg-slate-100 font-medium px-4 py-2.5 rounded-md transition">
+            Écran de validation client
+        </a>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-4 mb-6">
+        {% if projet.derniere_validation %}
+            <p class="text-sm text-emerald-700 font-medium">
+                ✓ Audit validé par {{ projet.derniere_validation.nom_signataire }}
+                le {{ projet.derniere_validation.created_at.strftime("%d/%m/%Y à %H:%M") }}
+            </p>
+        {% else %}
+            <p class="text-sm text-amber-700 font-medium mb-2">En attente de validation client</p>
+            <p class="text-xs text-slate-500 break-all">
+                Lien à partager : {{ url_for('validation.valider', token=projet.token, _external=True) }}
+            </p>
+        {% endif %}
+    </div>
+
     {% if projet.zones %}
         <ul class="space-y-2">
             {% for zone in projet.zones %}

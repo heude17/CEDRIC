@@ -15,11 +15,15 @@ def create_app(config_class=Config):
 
     from routes.audit import bp as audit_bp
     from routes.clients import bp as clients_bp
+    from routes.pdf import bp as pdf_bp
     from routes.projets import bp as projets_bp
+    from routes.validation import bp as validation_bp
 
     app.register_blueprint(clients_bp)
     app.register_blueprint(projets_bp)
     app.register_blueprint(audit_bp)
+    app.register_blueprint(pdf_bp)
+    app.register_blueprint(validation_bp)
 
     @app.route("/")
     def index():
