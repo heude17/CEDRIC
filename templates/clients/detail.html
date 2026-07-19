@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}{{ client.nom }}{% endblock %}
+{% block content %}
+    <div class="flex items-center justify-between mb-4">
+        <h1 class="text-xl font-bold">{{ client.nom }}</h1>
+        <a href="{{ url_for('projets.nouveau', client_id=client.id) }}"
+           class="text-sm bg-emerald-500 hover:bg-emerald-400 text-white font-medium px-3 py-1.5 rounded-md">
+            + Projet
+        </a>
+    </div>
+
+    <dl class="bg-white rounded-lg shadow-sm border border-slate-200 p-4 mb-6 text-sm space-y-1">
+        <div><dt class="inline font-medium text-slate-500">Email :</dt> <dd class="inline">{{ client.email or "—" }}</dd></div>
+        <div><dt class="inline font-medium text-slate-500">Téléphone :</dt> <dd class="inline">{{ client.telephone or "—" }}</dd></div>
+        <div><dt class="inline font-medium text-slate-500">Adresse :</dt> <dd class="inline">{{ client.adresse or "—" }}</dd></div>
+    </dl>
+
+    <h2 class="font-semibold mb-2">Projets</h2>
+    {% if client.projets %}
+        <ul class="space-y-2">
+            {% for projet in client.projets %}
+                <li>
+                    <a href="{{ url_for('audit.projet_detail', projet_id=projet.id) }}"
+                       class="block bg-white rounded-lg shadow-sm border border-slate-200 px-4 py-3 hover:border-emerald-400 transition">
+                        <div class="font-semibold">{{ projet.nom }}</div>
+                        <div class="text-sm text-slate-500">{{ projet.zones|length }} pièce(s) auditée(s)</div>
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-slate-500 text-sm">Aucun projet pour ce client.</p>
+    {% endif %}
+{% endblock %}

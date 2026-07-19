@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Page introuvable{% endblock %}
+{% block content %}
+    <div class="text-center py-16">
+        <p class="text-2xl font-bold mb-2">404</p>
+        <p class="text-slate-500 mb-4">Page introuvable.</p>
+        <a href="{{ url_for('clients.liste') }}" class="text-emerald-600 hover:underline">Retour à l'accueil</a>
+    </div>
+{% endblock %}

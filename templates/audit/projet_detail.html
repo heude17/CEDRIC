@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}{{ projet.nom }}{% endblock %}
+{% block content %}
+    <div class="flex items-center justify-between mb-4">
+        <div>
+            <h1 class="text-xl font-bold">{{ projet.nom }}</h1>
+            <a href="{{ url_for('clients.detail', client_id=projet.client_id) }}" class="text-sm text-slate-500 hover:underline">
+                {{ projet.client.nom }}
+            </a>
+        </div>
+        <a href="{{ url_for('audit.nouvelle_zone', projet_id=projet.id) }}"
+           class="text-sm bg-emerald-500 hover:bg-emerald-400 text-white font-medium px-3 py-1.5 rounded-md">
+            + Pièce
+        </a>
+    </div>
+
+    {% if projet.zones %}
+        <ul class="space-y-2">
+            {% for zone in projet.zones %}
+                <li>
+                    <a href="{{ url_for('audit.zone_detail', zone_id=zone.id) }}"
+                       class="block bg-white rounded-lg shadow-sm border border-slate-200 px-4 py-3 hover:border-emerald-400 transition">
+                        <div class="font-semibold">{{ zone.nom }}</div>
+                        <div class="text-sm text-slate-500">
+                            {{ zone.type_piece.replace("_", " ").capitalize() }}
+                            · {{ zone.composants|length }} composant(s)
+                        </div>
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <div class="text-center bg-white border border-dashed border-slate-300 rounded-lg py-10 px-4">
+            <p class="text-slate-500 mb-4">Aucune pièce auditée pour ce projet.</p>
+            <a href="{{ url_for('audit.nouvelle_zone', projet_id=projet.id) }}"
+               class="inline-block bg-emerald-500 hover:bg-emerald-400 text-white font-medium px-4 py-2 rounded-md">
+                Démarrer l'audit d'une pièce
+            </a>
+        </div>
+    {% endif %}
+{% endblock %}

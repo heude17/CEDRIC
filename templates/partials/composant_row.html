@@ -1,0 +1,24 @@
+{% from "_macros.html" import field %}
+
+{% macro composant_row(cf, label) %}
+    <fieldset class="composant-row border border-slate-200 rounded-lg p-4 mb-3 bg-slate-50 relative">
+        <div class="flex items-center justify-between mb-2">
+            <span class="text-sm font-semibold text-slate-600 composant-label">{{ label }}</span>
+            <button type="button"
+                    class="remove-composant text-xs text-red-500 hover:text-red-700 font-medium">
+                Supprimer
+            </button>
+        </div>
+
+        {{ field(cf.type_composant) }}
+        {{ field(cf.type_interrupteur) }}
+
+        <div class="grid grid-cols-2 gap-3">
+            {{ field(cf.presence_neutre) }}
+            {{ field(cf.besoin_motorisation) }}
+        </div>
+
+        {{ field(cf.quantite) }}
+        {{ field(cf.notes) }}
+    </fieldset>
+{% endmacro %}

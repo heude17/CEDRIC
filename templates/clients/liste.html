@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Clients — Audit Domotique{% endblock %}
+{% block content %}
+    <h1 class="text-xl font-bold mb-4">Clients</h1>
+
+    {% if clients %}
+        <ul class="space-y-2">
+            {% for client in clients %}
+                <li>
+                    <a href="{{ url_for('clients.detail', client_id=client.id) }}"
+                       class="block bg-white rounded-lg shadow-sm border border-slate-200 px-4 py-3 hover:border-emerald-400 transition">
+                        <div class="font-semibold">{{ client.nom }}</div>
+                        <div class="text-sm text-slate-500">{{ client.adresse or "Adresse non renseignée" }}</div>
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <div class="text-center bg-white border border-dashed border-slate-300 rounded-lg py-10 px-4">
+            <p class="text-slate-500 mb-4">Aucun client pour le moment.</p>
+            <a href="{{ url_for('clients.nouveau') }}"
+               class="inline-block bg-emerald-500 hover:bg-emerald-400 text-white font-medium px-4 py-2 rounded-md">
+                Créer le premier client
+            </a>
+        </div>
+    {% endif %}
+{% endblock %}

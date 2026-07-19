@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}{{ zone.nom }}{% endblock %}
+{% block content %}
+    <a href="{{ url_for('audit.projet_detail', projet_id=zone.projet_id) }}" class="text-sm text-slate-500 hover:underline">
+        &larr; {{ zone.projet.nom }}
+    </a>
+    <h1 class="text-xl font-bold mt-1 mb-1">{{ zone.nom }}</h1>
+    <p class="text-sm text-slate-500 mb-4">
+        {{ zone.type_piece.replace("_", " ").capitalize() }}
+        {% if zone.surface_m2 %} · {{ zone.surface_m2 }} m²{% endif %}
+    </p>
+
+    {% if zone.notes %}
+        <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-4 mb-4 text-sm">
+            {{ zone.notes }}
+        </div>
+    {% endif %}
+
+    <h2 class="font-semibold mb-2">Composants ({{ zone.composants|length }})</h2>
+    <div class="space-y-2">
+        {% for c in zone.composants %}
+            <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-4 text-sm">
+                <div class="flex items-center justify-between mb-1">
+                    <span class="font-semibold">{{ c.type_composant.replace("_", " ").capitalize() }}</span>
+                    <span class="text-slate-500">x{{ c.quantite }}</span>
+                </div>
+                <ul class="text-slate-600 space-y-0.5">
+                    <li>Interrupteur : {{ c.type_interrupteur.replace("_", " ").capitalize() }}</li>
+                    <li>Neutre présent : {{ "Oui" if c.presence_neutre else "Non" }}</li>
+                    <li>Motorisation requise : {{ "Oui" if c.besoin_motorisation else "Non" }}</li>
+                    {% if c.notes %}<li>Notes : {{ c.notes }}</li>{% endif %}
+                </ul>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% from "_macros.html" import field %}
+{% from "partials/composant_row.html" import composant_row %}
+{% block title %}Nouvelle pièce — {{ projet.nom }}{% endblock %}
+{% block content %}
+    <h1 class="text-xl font-bold mb-1">Audit d'une pièce</h1>
+    <p class="text-sm text-slate-500 mb-4">{{ projet.nom }}</p>
+
+    <form method="post" novalidate>
+        {{ form.hidden_tag() }}
+
+        <section class="bg-white rounded-lg shadow-sm border border-slate-200 p-4 mb-4">
+            <h2 class="font-semibold mb-3">Informations de la pièce</h2>
+            {{ field(form.nom) }}
+            {{ field(form.type_piece) }}
+            {{ field(form.surface_m2) }}
+            {{ field(form.notes) }}
+        </section>
+
+        <section class="bg-white rounded-lg shadow-sm border border-slate-200 p-4 mb-4">
+            <h2 class="font-semibold mb-3">Composants &amp; besoins domotique</h2>
+
+            <div id="composants-container">
+                {% for cf in form.composants %}
+                    {{ composant_row(cf, "Composant #" ~ loop.index) }}
+                {% endfor %}
+            </div>
+
+            <button type="button" id="add-composant"
+                    class="w-full border-2 border-dashed border-emerald-300 text-emerald-600 hover:bg-emerald-50 font-medium py-2.5 rounded-md transition">
+                + Ajouter un composant
+            </button>
+        </section>
+
+        <button type="submit"
+                class="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-white font-medium px-5 py-2.5 rounded-md transition">
+            Enregistrer l'audit de la pièce
+        </button>
+    </form>
+
+    <template id="composant-template">
+        {{ composant_row(composant_template, "Composant") }}
+    </template>
+
+    <script src="{{ url_for('static', filename='js/audit.js') }}"></script>
+{% endblock %}
