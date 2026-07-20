@@ -42,7 +42,7 @@ def nouvelle_zone(projet_id):
         form=form,
         projet=projet,
         zone=None,
-        composant_template=ComposantForm(prefix="composants-__INDEX__"),
+        composant_template=ComposantForm(prefix="composants-__INDEX__-"),
     )
 
 
@@ -72,7 +72,7 @@ def modifier_zone(zone_id):
         form=form,
         projet=zone.projet,
         zone=zone,
-        composant_template=ComposantForm(prefix="composants-__INDEX__"),
+        composant_template=ComposantForm(prefix="composants-__INDEX__-"),
     )
 
 
