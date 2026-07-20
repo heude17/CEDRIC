@@ -3,6 +3,7 @@ from flask import Blueprint, flash, redirect, render_template, url_for
 from forms.audit_forms import ClientForm
 from models import db
 from models.client import Client
+from services.uploads import remove_zone_files
 
 bp = Blueprint("clients", __name__, url_prefix="/clients")
 
@@ -57,6 +58,9 @@ def modifier(client_id):
 def supprimer(client_id):
     client = Client.query.get_or_404(client_id)
     nom = client.nom
+    for projet in client.projets:
+        for zone in projet.zones:
+            remove_zone_files(zone.id)
     db.session.delete(client)
     db.session.commit()
     flash(f"Client « {nom} » supprimé, avec tous ses projets et audits.", "success")

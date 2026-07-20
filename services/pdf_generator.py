@@ -1,17 +1,25 @@
+import os
 from datetime import datetime
 from io import BytesIO
 
+from flask import current_app
+from PIL import Image as PILImage
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import cm
 from reportlab.platypus import (
+    Image,
     Paragraph,
     SimpleDocTemplate,
     Spacer,
     Table,
     TableStyle,
 )
+
+PHOTO_MAX_WIDTH = 4.3 * cm
+PHOTO_MAX_HEIGHT = 4 * cm
+PHOTOS_PAR_PIECE_PDF = 3
 
 STYLES = getSampleStyleSheet()
 STYLE_TITLE = ParagraphStyle(
@@ -74,8 +82,50 @@ def _composants_table(zone):
     return table
 
 
-def generate_projet_pdf(projet):
+def _photo_thumbnail(path):
+    try:
+        with PILImage.open(path) as img:
+            largeur, hauteur = img.size
+    except (OSError, ValueError):
+        return None
+    ratio = min(PHOTO_MAX_WIDTH / largeur, PHOTO_MAX_HEIGHT / hauteur)
+    return Image(path, width=largeur * ratio, height=hauteur * ratio)
+
+
+def _photos_flowable(zone, upload_folder):
+    photos = zone.photos[:PHOTOS_PAR_PIECE_PDF]
+    vignettes = []
+    for photo in photos:
+        chemin = os.path.join(upload_folder, str(zone.id), photo.filename)
+        if not os.path.exists(chemin):
+            continue
+        vignette = _photo_thumbnail(chemin)
+        if vignette:
+            vignettes.append(vignette)
+
+    if not vignettes:
+        return None
+
+    table = Table([vignettes], colWidths=[PHOTO_MAX_WIDTH] * len(vignettes))
+    table.setStyle(
+        TableStyle(
+            [
+                ("LEFTPADDING", (0, 0), (-1, -1), 0),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 8),
+                ("TOPPADDING", (0, 0), (-1, -1), 4),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+                ("VALIGN", (0, 0), (-1, -1), "TOP"),
+            ]
+        )
+    )
+    return table
+
+
+def generate_projet_pdf(projet, upload_folder=None):
     """Génère le rapport d'audit complet d'un projet (toutes les pièces)."""
+    if upload_folder is None:
+        upload_folder = current_app.config["UPLOAD_FOLDER"]
+
     buffer = BytesIO()
     doc = SimpleDocTemplate(
         buffer,
@@ -133,6 +183,15 @@ def generate_projet_pdf(projet):
             story.append(_composants_table(zone))
         else:
             story.append(Paragraph("Aucun composant renseigné.", STYLE_MUTED))
+
+        photos_flowable = _photos_flowable(zone, upload_folder)
+        if photos_flowable:
+            story.append(Spacer(1, 0.2 * cm))
+            story.append(photos_flowable)
+            if len(zone.photos) > PHOTOS_PAR_PIECE_PDF:
+                reste = len(zone.photos) - PHOTOS_PAR_PIECE_PDF
+                story.append(Paragraph(f"+ {reste} autre(s) photo(s) disponible(s) en ligne.", STYLE_MUTED))
+
         story.append(Spacer(1, 0.3 * cm))
 
     validation = projet.derniere_validation

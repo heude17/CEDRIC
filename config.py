@@ -9,3 +9,7 @@ class Config:
         "DATABASE_URL", f"sqlite:///{os.path.join(BASE_DIR, 'instance', 'audit.db')}"
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    UPLOAD_FOLDER = os.path.join(BASE_DIR, "static", "uploads", "zones")
+    ALLOWED_PHOTO_EXTENSIONS = {"png", "jpg", "jpeg", "webp"}
+    MAX_CONTENT_LENGTH = 20 * 1024 * 1024  # 20 Mo par requête (plusieurs photos)

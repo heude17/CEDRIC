@@ -5,6 +5,7 @@ from models import db
 from models.composant import Composant
 from models.projet import Projet
 from models.zone import Zone
+from services.uploads import remove_zone_files
 
 bp = Blueprint("audit", __name__, url_prefix="/projets")
 
@@ -78,6 +79,9 @@ def supprimer_zone(zone_id):
     zone = Zone.query.get_or_404(zone_id)
     projet_id = zone.projet_id
     nom = zone.nom
+
+    remove_zone_files(zone.id)
+
     db.session.delete(zone)
     db.session.commit()
     flash(f"Pièce « {nom} » supprimée.", "success")

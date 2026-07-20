@@ -29,6 +29,10 @@ class Zone(db.Model):
     composants = db.relationship(
         "Composant", back_populates="zone", cascade="all, delete-orphan"
     )
+    photos = db.relationship(
+        "Photo", back_populates="zone", cascade="all, delete-orphan",
+        order_by="Photo.created_at",
+    )
 
     def to_dict(self):
         return {
@@ -39,6 +43,7 @@ class Zone(db.Model):
             "surface_m2": self.surface_m2,
             "notes": self.notes,
             "composants": [composant.to_dict() for composant in self.composants],
+            "photos": [photo.to_dict() for photo in self.photos],
         }
 
     def __repr__(self):

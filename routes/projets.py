@@ -4,6 +4,7 @@ from forms.audit_forms import ProjetForm
 from models import db
 from models.client import Client
 from models.projet import Projet
+from services.uploads import remove_zone_files
 
 bp = Blueprint("projets", __name__, url_prefix="/clients/<int:client_id>/projets")
 
@@ -56,6 +57,8 @@ def supprimer(client_id, projet_id):
     if projet.client_id != client_id:
         abort(404)
     nom = projet.nom
+    for zone in projet.zones:
+        remove_zone_files(zone.id)
     db.session.delete(projet)
     db.session.commit()
     flash(f"Projet « {nom} » supprimé.", "success")

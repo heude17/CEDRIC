@@ -14,12 +14,14 @@ def create_app(config_class=Config):
     app.config.from_object(config_class)
 
     os.makedirs(os.path.join(app.root_path, "instance"), exist_ok=True)
+    os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
     db.init_app(app)
     csrf.init_app(app)
 
     from routes.audit import bp as audit_bp
     from routes.clients import bp as clients_bp
     from routes.pdf import bp as pdf_bp
+    from routes.photos import bp as photos_bp
     from routes.projets import bp as projets_bp
     from routes.validation import bp as validation_bp
 
@@ -27,6 +29,7 @@ def create_app(config_class=Config):
     app.register_blueprint(projets_bp)
     app.register_blueprint(audit_bp)
     app.register_blueprint(pdf_bp)
+    app.register_blueprint(photos_bp)
     app.register_blueprint(validation_bp)
 
     @app.route("/")
