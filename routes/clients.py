@@ -3,9 +3,11 @@ from flask import Blueprint, flash, redirect, render_template, url_for
 from forms.audit_forms import ClientForm
 from models import db
 from models.client import Client
+from routes.auth import require_login
 from services.uploads import remove_zone_files
 
 bp = Blueprint("clients", __name__, url_prefix="/clients")
+bp.before_request(require_login)
 
 
 @bp.route("/")

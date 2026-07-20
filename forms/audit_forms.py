@@ -6,6 +6,7 @@ from wtforms import (
     FormField,
     HiddenField,
     IntegerField,
+    PasswordField,
     SelectField,
     StringField,
     TextAreaField,
@@ -78,3 +79,8 @@ class ValidationForm(FlaskForm):
             Regexp(r"^data:image/png;base64,", message="Signature invalide."),
         ]
     )
+
+
+class LoginForm(FlaskForm):
+    email = StringField("Email", validators=[DataRequired(), Email()])
+    password = PasswordField("Mot de passe", validators=[DataRequired()])

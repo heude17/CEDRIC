@@ -7,9 +7,11 @@ from werkzeug.utils import secure_filename
 from models import db
 from models.photo import Photo
 from models.zone import Zone
+from routes.auth import require_login
 from services.uploads import zone_upload_folder
 
 bp = Blueprint("photos", __name__, url_prefix="/projets/zones")
+bp.before_request(require_login)
 
 
 def _extension_allowed(filename):

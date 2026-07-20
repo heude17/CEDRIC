@@ -4,9 +4,11 @@ from forms.audit_forms import ProjetForm
 from models import db
 from models.client import Client
 from models.projet import Projet
+from routes.auth import require_login
 from services.uploads import remove_zone_files
 
 bp = Blueprint("projets", __name__, url_prefix="/clients/<int:client_id>/projets")
+bp.before_request(require_login)
 
 
 @bp.route("/nouveau", methods=["GET", "POST"])

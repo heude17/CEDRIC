@@ -3,9 +3,11 @@ import re
 from flask import Blueprint, send_file
 
 from models.projet import Projet
+from routes.auth import require_login
 from services.pdf_generator import generate_projet_pdf
 
 bp = Blueprint("pdf", __name__, url_prefix="/projets")
+bp.before_request(require_login)
 
 
 def _slugify(value):

@@ -5,9 +5,11 @@ from models import db
 from models.composant import Composant
 from models.projet import Projet
 from models.zone import Zone
+from routes.auth import require_login
 from services.uploads import remove_zone_files
 
 bp = Blueprint("audit", __name__, url_prefix="/projets")
+bp.before_request(require_login)
 
 
 @bp.route("/<int:projet_id>")
