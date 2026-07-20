@@ -2,12 +2,15 @@ import os
 
 from flask import Flask, redirect, render_template, url_for
 from flask_login import LoginManager
+from flask_migrate import Migrate
 from flask_wtf import CSRFProtect
+from sqlalchemy.exc import OperationalError, ProgrammingError
 
 from config import Config
 from models import db
 
 csrf = CSRFProtect()
+migrate = Migrate()
 login_manager = LoginManager()
 login_manager.login_view = "auth.connexion"
 login_manager.login_message = "Veuillez vous connecter pour accéder à cette page."
@@ -21,6 +24,7 @@ def create_app(config_class=Config):
     os.makedirs(os.path.join(app.root_path, "instance"), exist_ok=True)
     os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
     db.init_app(app)
+    migrate.init_app(app, db)
     csrf.init_app(app)
     login_manager.init_app(app)
 
@@ -55,17 +59,26 @@ def create_app(config_class=Config):
         return render_template("404.html"), 404
 
     with app.app_context():
-        db.create_all()
         _ensure_default_technicien(app)
 
     return app
 
 
 def _ensure_default_technicien(app):
+    """Provisionne le compte technicien par défaut si le schéma est déjà migré.
+
+    Ignoré silencieusement si les tables n'existent pas encore (ex: lors de
+    `flask db init`/`flask db migrate`, avant tout `flask db upgrade`).
+    """
     from models.technicien import Technicien
 
-    if Technicien.query.count() > 0:
+    try:
+        if Technicien.query.count() > 0:
+            return
+    except (OperationalError, ProgrammingError):
+        db.session.rollback()
         return
+
     technicien = Technicien(nom="Technicien", email=app.config["TECHNICIEN_EMAIL"])
     technicien.set_password(app.config["TECHNICIEN_PASSWORD"])
     db.session.add(technicien)
