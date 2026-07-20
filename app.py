@@ -1,9 +1,12 @@
 import os
 
 from flask import Flask, redirect, render_template, url_for
+from flask_wtf import CSRFProtect
 
 from config import Config
 from models import db
+
+csrf = CSRFProtect()
 
 
 def create_app(config_class=Config):
@@ -12,6 +15,7 @@ def create_app(config_class=Config):
 
     os.makedirs(os.path.join(app.root_path, "instance"), exist_ok=True)
     db.init_app(app)
+    csrf.init_app(app)
 
     from routes.audit import bp as audit_bp
     from routes.clients import bp as clients_bp

@@ -2,6 +2,7 @@ from flask import Blueprint, flash, redirect, render_template, url_for
 
 from forms.audit_forms import ComposantForm, ZoneForm
 from models import db
+from models.composant import Composant
 from models.projet import Projet
 from models.zone import Zone
 
@@ -27,19 +28,18 @@ def nouvelle_zone(projet_id):
             surface_m2=form.surface_m2.data,
             notes=form.notes.data,
         )
-        for composant_form in form.composants.entries:
-            zone.composants.append(_composant_from_form(composant_form.form))
+        zone.composants = [_composant_from_form(cf.form) for cf in form.composants.entries]
         db.session.add(zone)
         db.session.commit()
         flash(f"Pièce « {zone.nom} » enregistrée avec {len(zone.composants)} composant(s).", "success")
         return redirect(url_for("audit.zone_detail", zone_id=zone.id))
 
-    composant_template = ComposantForm(prefix="composants-__INDEX__")
     return render_template(
         "audit/nouvelle_zone.html",
         form=form,
         projet=projet,
-        composant_template=composant_template,
+        zone=None,
+        composant_template=ComposantForm(prefix="composants-__INDEX__"),
     )
 
 
@@ -49,9 +49,42 @@ def zone_detail(zone_id):
     return render_template("audit/zone_detail.html", zone=zone)
 
 
-def _composant_from_form(composant_form):
-    from models.composant import Composant
+@bp.route("/zones/<int:zone_id>/modifier", methods=["GET", "POST"])
+def modifier_zone(zone_id):
+    zone = Zone.query.get_or_404(zone_id)
+    form = ZoneForm(obj=zone)
 
+    if form.validate_on_submit():
+        zone.nom = form.nom.data
+        zone.type_piece = form.type_piece.data
+        zone.surface_m2 = form.surface_m2.data
+        zone.notes = form.notes.data
+        zone.composants = [_composant_from_form(cf.form) for cf in form.composants.entries]
+        db.session.commit()
+        flash(f"Pièce « {zone.nom} » mise à jour.", "success")
+        return redirect(url_for("audit.zone_detail", zone_id=zone.id))
+
+    return render_template(
+        "audit/nouvelle_zone.html",
+        form=form,
+        projet=zone.projet,
+        zone=zone,
+        composant_template=ComposantForm(prefix="composants-__INDEX__"),
+    )
+
+
+@bp.route("/zones/<int:zone_id>/supprimer", methods=["POST"])
+def supprimer_zone(zone_id):
+    zone = Zone.query.get_or_404(zone_id)
+    projet_id = zone.projet_id
+    nom = zone.nom
+    db.session.delete(zone)
+    db.session.commit()
+    flash(f"Pièce « {nom} » supprimée.", "success")
+    return redirect(url_for("audit.projet_detail", projet_id=projet_id))
+
+
+def _composant_from_form(composant_form):
     return Composant(
         type_composant=composant_form.type_composant.data,
         type_interrupteur=composant_form.type_interrupteur.data,

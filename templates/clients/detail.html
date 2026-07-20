@@ -1,12 +1,23 @@
 {% extends "base.html" %}
+{% from "_macros.html" import delete_button %}
 {% block title %}{{ client.nom }}{% endblock %}
 {% block content %}
-    <div class="flex items-center justify-between mb-4">
+    <div class="flex items-center justify-between mb-1">
         <h1 class="text-xl font-bold">{{ client.nom }}</h1>
         <a href="{{ url_for('projets.nouveau', client_id=client.id) }}"
            class="text-sm bg-emerald-500 hover:bg-emerald-400 text-white font-medium px-3 py-1.5 rounded-md">
             + Projet
         </a>
+    </div>
+
+    <div class="flex items-center gap-3 mb-4">
+        <a href="{{ url_for('clients.modifier', client_id=client.id) }}"
+           class="text-sm text-slate-500 hover:underline">Modifier le client</a>
+        {{ delete_button(
+            url_for('clients.supprimer', client_id=client.id),
+            "Supprimer définitivement « " ~ client.nom ~ " » et tous ses projets/audits ?",
+            label="Supprimer le client"
+        ) }}
     </div>
 
     <dl class="bg-white rounded-lg shadow-sm border border-slate-200 p-4 mb-6 text-sm space-y-1">

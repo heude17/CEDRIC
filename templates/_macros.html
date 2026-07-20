@@ -20,3 +20,12 @@
         {% endif %}
     </div>
 {% endmacro %}
+
+{% macro delete_button(action_url, message, label="Supprimer", extra_class="") %}
+    <form method="post" action="{{ action_url }}" onsubmit="return confirm({{ message|tojson }});" class="inline">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="text-sm text-red-600 hover:text-red-800 font-medium {{ extra_class }}">
+            {{ label }}
+        </button>
+    </form>
+{% endmacro %}

@@ -1,7 +1,8 @@
 {% extends "base.html" %}
+{% from "_macros.html" import delete_button %}
 {% block title %}{{ projet.nom }}{% endblock %}
 {% block content %}
-    <div class="flex items-center justify-between mb-4">
+    <div class="flex items-center justify-between mb-1">
         <div>
             <h1 class="text-xl font-bold">{{ projet.nom }}</h1>
             <a href="{{ url_for('clients.detail', client_id=projet.client_id) }}" class="text-sm text-slate-500 hover:underline">
@@ -12,6 +13,16 @@
            class="text-sm bg-emerald-500 hover:bg-emerald-400 text-white font-medium px-3 py-1.5 rounded-md">
             + Pièce
         </a>
+    </div>
+
+    <div class="flex items-center gap-3 mb-4">
+        <a href="{{ url_for('projets.modifier', client_id=projet.client_id, projet_id=projet.id) }}"
+           class="text-sm text-slate-500 hover:underline">Modifier le projet</a>
+        {{ delete_button(
+            url_for('projets.supprimer', client_id=projet.client_id, projet_id=projet.id),
+            "Supprimer définitivement le projet « " ~ projet.nom ~ " » et toutes ses pièces auditées ?",
+            label="Supprimer le projet"
+        ) }}
     </div>
 
     <div class="flex flex-col sm:flex-row gap-2 mb-4">
@@ -42,15 +53,24 @@
     {% if projet.zones %}
         <ul class="space-y-2">
             {% for zone in projet.zones %}
-                <li>
-                    <a href="{{ url_for('audit.zone_detail', zone_id=zone.id) }}"
-                       class="block bg-white rounded-lg shadow-sm border border-slate-200 px-4 py-3 hover:border-emerald-400 transition">
+                <li class="bg-white rounded-lg shadow-sm border border-slate-200 px-4 py-3 hover:border-emerald-400 transition">
+                    <a href="{{ url_for('audit.zone_detail', zone_id=zone.id) }}" class="block">
                         <div class="font-semibold">{{ zone.nom }}</div>
                         <div class="text-sm text-slate-500">
                             {{ zone.type_piece.replace("_", " ").capitalize() }}
                             · {{ zone.composants|length }} composant(s)
                         </div>
                     </a>
+                    <div class="flex items-center gap-3 mt-2">
+                        <a href="{{ url_for('audit.modifier_zone', zone_id=zone.id) }}"
+                           class="text-xs text-slate-500 hover:underline">Modifier</a>
+                        {{ delete_button(
+                            url_for('audit.supprimer_zone', zone_id=zone.id),
+                            "Supprimer définitivement la pièce « " ~ zone.nom ~ " » ?",
+                            label="Supprimer",
+                            extra_class="text-xs"
+                        ) }}
+                    </div>
                 </li>
             {% endfor %}
         </ul>

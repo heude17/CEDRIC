@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% from "_macros.html" import field %}
 {% from "partials/composant_row.html" import composant_row %}
-{% block title %}Nouvelle pièce — {{ projet.nom }}{% endblock %}
+{% block title %}{{ "Modifier la pièce" if zone else "Nouvelle pièce" }} — {{ projet.nom }}{% endblock %}
 {% block content %}
-    <h1 class="text-xl font-bold mb-1">Audit d'une pièce</h1>
+    <h1 class="text-xl font-bold mb-1">{{ "Modifier la pièce" if zone else "Audit d'une pièce" }}</h1>
     <p class="text-sm text-slate-500 mb-4">{{ projet.nom }}</p>
 
     <form method="post" novalidate>
@@ -34,9 +34,20 @@
 
         <button type="submit"
                 class="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-white font-medium px-5 py-2.5 rounded-md transition">
-            Enregistrer l'audit de la pièce
+            {{ "Enregistrer les modifications" if zone else "Enregistrer l'audit de la pièce" }}
         </button>
     </form>
+
+    {% if zone %}
+        <div class="mt-4">
+            {% from "_macros.html" import delete_button %}
+            {{ delete_button(
+                url_for('audit.supprimer_zone', zone_id=zone.id),
+                "Supprimer définitivement la pièce « " ~ zone.nom ~ " » et ses composants ?",
+                label="Supprimer cette pièce"
+            ) }}
+        </div>
+    {% endif %}
 
     <template id="composant-template">
         {{ composant_row(composant_template, "Composant") }}

@@ -1,8 +1,10 @@
 {% extends "base.html" %}
 {% from "_macros.html" import field %}
-{% block title %}Nouveau projet{% endblock %}
+{% block title %}{{ "Modifier le projet" if projet else "Nouveau projet" }}{% endblock %}
 {% block content %}
-    <h1 class="text-xl font-bold mb-4">Nouveau projet — {{ client.nom }}</h1>
+    <h1 class="text-xl font-bold mb-4">
+        {{ "Modifier le projet" if projet else "Nouveau projet" }} — {{ client.nom }}
+    </h1>
     <form method="post" class="bg-white rounded-lg shadow-sm border border-slate-200 p-4">
         {{ form.hidden_tag() }}
         {{ field(form.nom) }}
@@ -10,7 +12,7 @@
         {{ field(form.notes) }}
         <button type="submit"
                 class="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-white font-medium px-5 py-2.5 rounded-md transition">
-            Enregistrer le projet
+            {{ "Enregistrer les modifications" if projet else "Enregistrer le projet" }}
         </button>
     </form>
 {% endblock %}

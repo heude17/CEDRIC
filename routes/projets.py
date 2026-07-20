@@ -23,7 +23,7 @@ def nouveau(client_id):
         db.session.commit()
         flash(f"Projet « {projet.nom} » créé.", "success")
         return redirect(url_for("audit.projet_detail", projet_id=projet.id))
-    return render_template("projets/form.html", form=form, client=client)
+    return render_template("projets/form.html", form=form, client=client, projet=None)
 
 
 @bp.route("/<int:projet_id>")
@@ -32,3 +32,31 @@ def detail(client_id, projet_id):
     if projet.client_id != client_id:
         abort(404)
     return redirect(url_for("audit.projet_detail", projet_id=projet.id))
+
+
+@bp.route("/<int:projet_id>/modifier", methods=["GET", "POST"])
+def modifier(client_id, projet_id):
+    projet = Projet.query.get_or_404(projet_id)
+    if projet.client_id != client_id:
+        abort(404)
+    form = ProjetForm(obj=projet)
+    if form.validate_on_submit():
+        projet.nom = form.nom.data
+        projet.adresse_chantier = form.adresse_chantier.data
+        projet.notes = form.notes.data
+        db.session.commit()
+        flash(f"Projet « {projet.nom} » mis à jour.", "success")
+        return redirect(url_for("audit.projet_detail", projet_id=projet.id))
+    return render_template("projets/form.html", form=form, client=projet.client, projet=projet)
+
+
+@bp.route("/<int:projet_id>/supprimer", methods=["POST"])
+def supprimer(client_id, projet_id):
+    projet = Projet.query.get_or_404(projet_id)
+    if projet.client_id != client_id:
+        abort(404)
+    nom = projet.nom
+    db.session.delete(projet)
+    db.session.commit()
+    flash(f"Projet « {nom} » supprimé.", "success")
+    return redirect(url_for("clients.detail", client_id=client_id))

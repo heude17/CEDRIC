@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% from "_macros.html" import field %}
-{% block title %}Nouveau client{% endblock %}
+{% block title %}{{ "Modifier le client" if client else "Nouveau client" }}{% endblock %}
 {% block content %}
-    <h1 class="text-xl font-bold mb-4">Nouveau client</h1>
+    <h1 class="text-xl font-bold mb-4">{{ "Modifier le client" if client else "Nouveau client" }}</h1>
     <form method="post" class="bg-white rounded-lg shadow-sm border border-slate-200 p-4">
         {{ form.hidden_tag() }}
         {{ field(form.nom) }}
@@ -12,7 +12,7 @@
         {{ field(form.notes) }}
         <button type="submit"
                 class="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-white font-medium px-5 py-2.5 rounded-md transition">
-            Enregistrer le client
+            {{ "Enregistrer les modifications" if client else "Enregistrer le client" }}
         </button>
     </form>
 {% endblock %}
