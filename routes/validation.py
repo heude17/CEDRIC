@@ -19,6 +19,7 @@ def valider(token):
             nom_signataire=form.nom_signataire.data,
             email_signataire=form.email_signataire.data,
             commentaire=form.commentaire.data,
+            signature=form.signature.data,
         )
         db.session.add(validation)
         projet.statut = "termine"

@@ -1,3 +1,4 @@
+import base64
 import os
 from datetime import datetime
 from io import BytesIO
@@ -20,6 +21,8 @@ from reportlab.platypus import (
 PHOTO_MAX_WIDTH = 4.3 * cm
 PHOTO_MAX_HEIGHT = 4 * cm
 PHOTOS_PAR_PIECE_PDF = 3
+SIGNATURE_MAX_WIDTH = 5 * cm
+SIGNATURE_MAX_HEIGHT = 2.5 * cm
 
 STYLES = getSampleStyleSheet()
 STYLE_TITLE = ParagraphStyle(
@@ -121,6 +124,21 @@ def _photos_flowable(zone, upload_folder):
     return table
 
 
+def _signature_image(data_uri):
+    if not data_uri or not data_uri.startswith("data:image/png;base64,"):
+        return None
+    try:
+        raw = base64.b64decode(data_uri.split(",", 1)[1])
+        buf = BytesIO(raw)
+        with PILImage.open(buf) as img:
+            largeur, hauteur = img.size
+        buf.seek(0)
+    except (OSError, ValueError, IndexError):
+        return None
+    ratio = min(SIGNATURE_MAX_WIDTH / largeur, SIGNATURE_MAX_HEIGHT / hauteur, 1)
+    return Image(buf, width=largeur * ratio, height=hauteur * ratio)
+
+
 def generate_projet_pdf(projet, upload_folder=None):
     """Génère le rapport d'audit complet d'un projet (toutes les pièces)."""
     if upload_folder is None:
@@ -207,6 +225,11 @@ def generate_projet_pdf(projet, upload_folder=None):
         if validation.commentaire:
             story.append(Spacer(1, 0.15 * cm))
             story.append(Paragraph(f"Commentaire : {validation.commentaire}", STYLE_BODY))
+        signature_image = _signature_image(validation.signature)
+        if signature_image:
+            story.append(Spacer(1, 0.2 * cm))
+            story.append(Paragraph("Signature :", STYLE_MUTED))
+            story.append(signature_image)
     else:
         story.append(Paragraph("Audit non encore validé par le client.", STYLE_MUTED))
 

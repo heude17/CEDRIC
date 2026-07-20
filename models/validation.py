@@ -11,6 +11,7 @@ class Validation(db.Model):
     nom_signataire = db.Column(db.String(120), nullable=False)
     email_signataire = db.Column(db.String(120))
     commentaire = db.Column(db.Text)
+    signature = db.Column(db.Text)  # image PNG encodée en data URI base64
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     projet = db.relationship("Projet", back_populates="validations")

@@ -4,12 +4,13 @@ from wtforms import (
     FieldList,
     FloatField,
     FormField,
+    HiddenField,
     IntegerField,
     SelectField,
     StringField,
     TextAreaField,
 )
-from wtforms.validators import DataRequired, Email, NumberRange, Optional
+from wtforms.validators import DataRequired, Email, NumberRange, Optional, Regexp
 
 from models.composant import TYPES_COMPOSANT, TYPES_INTERRUPTEUR
 from models.zone import TYPES_PIECE
@@ -70,4 +71,10 @@ class ValidationForm(FlaskForm):
     confirmation = BooleanField(
         "Je certifie avoir vérifié les informations de cet audit",
         validators=[DataRequired(message="La confirmation est requise pour valider l'audit.")],
+    )
+    signature = HiddenField(
+        validators=[
+            DataRequired(message="Une signature est requise pour valider l'audit."),
+            Regexp(r"^data:image/png;base64,", message="Signature invalide."),
+        ]
     )
