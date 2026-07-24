@@ -87,4 +87,6 @@ def _ensure_default_technicien(app):
 
 if __name__ == "__main__":
     app = create_app()
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    debug = os.environ.get("FLASK_DEBUG", "true").lower() == "true"
+    port = int(os.environ.get("PORT", 5000))
+    app.run(debug=debug, host="0.0.0.0", port=port)
